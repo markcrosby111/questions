@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Button } from "@/components/ui/button";
-
+import logo from '/The_Table.png';
 const startSmallQuestions = [
   "What hobby do you wish you had more time to pursue?",
   "When was the last time you changed your mind about something?",
