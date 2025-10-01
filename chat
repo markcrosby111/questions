@@ -107,20 +107,33 @@ const goDeeperQuestions = [
   "If you knew you were living your last day, what would you lower in importance that you currently hold as important?"
 ];
 
+function getRandomQuestion(list, recentQuestions, setRecentQuestions) {
+  let question;
+  const available = list.filter(q => !recentQuestions.includes(q));
+
+  if (available.length === 0) {
+    // Reset recent list if all have been shown recently
+    setRecentQuestions([]);
+    question = list[Math.floor(Math.random() * list.length)];
+  } else {
+    question = available[Math.floor(Math.random() * available.length)];
+  }
+
+  setRecentQuestions(prev => [question, ...prev.slice(0, 9)]); // keep only last 10
+  return question;
+}
+
 export default function RandomQuestionApp() {
   const [question, setQuestion] = useState('');
-
-  const getRandomQuestion = (list) => {
-    const index = Math.floor(Math.random() * list.length);
-    setQuestion(list[index]);
-  };
+  const [recentStartSmall, setRecentStartSmall] = useState([]);
+  const [recentGoDeeper, setRecentGoDeeper] = useState([]);
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center p-6 text-center">
       <h1 className="text-2xl font-bold mb-6">Table Conversations</h1>
       <div className="flex flex-col gap-4 mb-6">
-        <Button onClick={() => getRandomQuestion(startSmallQuestions)}>Start Small</Button>
-        <Button onClick={() => getRandomQuestion(goDeeperQuestions)}>Go Deeper</Button>
+        <Button onClick={() => setQuestion(getRandomQuestion(startSmallQuestions, recentStartSmall, setRecentStartSmall))}>Start Small</Button>
+        <Button onClick={() => setQuestion(getRandomQuestion(goDeeperQuestions, recentGoDeeper, setRecentGoDeeper))}>Go Deeper</Button>
       </div>
       {question && (
         <p className="text-lg max-w-xl">{question}</p>
