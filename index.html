@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Table Conversations</title>
+  <style>
+    :root { --bg:#f7f7f8; --card:#ffffff; --text:#111; --muted:#555; --brand:#111; }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0; background:var(--bg); color:var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, "Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol";
+      display:flex; align-items:center; justify-content:center;
+    }
+    .wrap{
+      width:100%; max-width:720px; padding:24px;
+    }
+    .card{
+      background:var(--card); border-radius:16px; box-shadow: 0 6px 24px rgba(0,0,0,.08);
+      padding:24px; text-align:center;
+    }
+    img.logo{width:220px; max-width:70%; height:auto; display:block; margin:0 auto 16px auto}
+    h1{font-size:24px; margin:8px 0 16px 0}
+    p.lead{margin:0 0 16px 0; color:var(--muted)}
+    .btns{display:flex; gap:12px; justify-content:center; flex-wrap:wrap; margin:12px 0 16px}
+    button{
+      appearance:none; border:1px solid #ddd; background:#fff; color:#111;
+      padding:12px 16px; border-radius:999px; font-size:16px; cursor:pointer;
+      transition:transform .02s ease, box-shadow .2s ease;
+    }
+    button:active{ transform:scale(.985) }
+    #question{
+      font-size:20px; line-height:1.4; margin:8px auto 0; max-width:46ch;
+    }
+    .meta{margin-top:12px; color:#777; font-size:13px}
+    .meta a{color:#777; text-decoration:underline; cursor:pointer}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="card">
+      <img class="logo" src="./The_Table.png" alt="The Table logo" />
+      <h1>Table Conversations</h1>
+      <div class="btns">
+        <button id="btnStart">Start Small</button>
+        <button id="btnDeep">Go Deeper</button>
+      </div>
+      <p id="question"></p>
+      <div class="meta"><span id="counter"></span> · <a id="reset" href="#">reset recent</a></div>
+    </div>
+  </div>
+
+<script>
+// ----------------- QUESTIONS -----------------
+const START_SMALL = [
+  "What hobby do you wish you had more time to pursue?",
+  "When was the last time you changed your mind about something?",
+  "If you could research one topic for your full-time job, what would you choose?",
+  "What would you title this chapter of your life story?",
+  "What is one funny but embarrassing memory you have from growing up?",
+  "What was one of your favorite days in the last month, and why?",
+  "What activities or environments spark the most joy for you?",
+  "What is a place that holds significant meaning for you, and why is it so special?",
+  "What book, other than the Bible, do you think every person needs to read?",
+  "What is a simple pleasure you have that brings you delight?",
+  "Are you more of a spender or a saver?",
+  "What is one of your favorite activities to do on a day off?",
+  "If you could have dinner with one person, living or dead (other than Jesus), who would it be and why?",
+  "What is one thing you regret quitting when you did or something you wish you had quit sooner?",
+  "What is the quality you value most in a friend?",
+  "What is an adventure on your bucket list you hope to experience one day?",
+  "What was the last moment that caused you to experience awe or wonder?",
+  "If you were asked to give a 15-minute presentation on anything, what subject and title would you choose?",
+  "If you were a character in a movie, what character would you be, and what movie would you be in?",
+  "What is another city or country you could see yourself living in, and why?",
+  "What is a cause or issue of injustice you feel strongly about?",
+  "What subject or topic would you say you have the most expertise in?",
+  "What is one of your quirkiest pet peeves?",
+  "What emotion have you felt the most this week, and why?",
+  "What are you currently curious about?",
+  "If you could go to one historical event, which would you choose?",
+  "What is a memorable piece of advice you have received?",
+  "What is one of your proudest accomplishments, big or small?",
+  "If you came with a disclaimer, what would it be?",
+  "If you won the lottery, what would you do with the money?",
+  "What is one small way you contributed to someone else’s happiness or well-being recently?",
+  "What are a couple of items on your personal 'dopamine menu'?",
+  "What is the most memorable gift you have ever received?",
+  "What is a piece of art (painting, architecture, sculpture, film, etc.) that resonates with you, and why?",
+  "Share about a time when someone was generous with you. Who was it, and what happened?",
+  "What fictional world or universe would you most like to live in, and why?",
+  "If you could collaborate on a book with any author, past or present, who would it be, and what would the book be about?",
+  "If you could have God respond to one question today, what would it be?",
+  "If you were to show someone around your hometown, what is the first place you would take them to that holds meaning for you?",
+  "What was the best concert you have been to, and why?",
+  "If you could use only three words to describe your family, what would they be?",
+  "Where is your favorite place you have ever traveled to, and why?",
+  "How do you most naturally express love to the people you care about?",
+  "What is a small or simple thing you want to be more grateful for?",
+  "What conditions seem to bring out your best self? How about your worst self?",
+  "What story from the Gospels do you find most moving?",
+  "Which person from the Gospels do you most relate to, and why?",
+  "What are you currently learning about yourself?",
+  "What has recently changed in your life for the better?",
+  "What was an irrational fear that you had as a child?"
+];
+
+const GO_DEEPER = [
+  "What is one pattern from your family of origin you hope to carry forward, and what is one you hope to leave behind?",
+  "Who is one of your 'heroes' (close or at a distance), and what about them do you admire most?",
+  "Finish the sentence: I am working on accepting _____.",
+  "What is something you are trying to unlearn as of late?",
+  "What was the last encouragement someone shared with you that had a meaningful impact on you?",
+  "When you pass away, what is one thing you hope your loved ones say about you?",
+  "What is a difficult experience you went through that you initially resented but now feel grateful for?",
+  "What teaching of Jesus do you find hardest to live out or understand?",
+  "Who were you closest to in your family growing up, and how has that relationship changed or stayed the same?",
+  "Where are you in your family’s birth order, and how do you think that shaped you as a person?",
+  "How have you experienced the power of forgiveness, whether by offering it or receiving it yourself?",
+  "What do you think your younger self would admire about you today?",
+  "If your future self could give you advice for this coming season, what do you think they would say?",
+  "What is something you want to let go of this year?",
+  "What was a major turning point you experienced in life?",
+  "What attribute or posture of Jesus do you most desire to embody?",
+  "What might you regret in the next ten years if your life continues as it is, and what can you do about it now?",
+  "What is one longing you have that you are waiting to see fulfilled?",
+  "If your week were a candle, is the flame burning bright, low, or somewhere in between? Why?",
+  "What was a challenge you faced as a youth that still shows up in your life today?",
+  "What is a lie you are struggling not to believe?",
+  "What is your favorite moment you experienced with your child (or that you remember experiencing with your parents)?",
+  "What do you like most about yourself?",
+  "What is one answered prayer and one unanswered prayer in your life from the past year?",
+  "Who has shaped and influenced you the most in life, other than Jesus, and how?",
+  "If we asked a good friend of yours, what values would they say you most live by?",
+  "What places or practices foster the deepest sense of rest for your soul these days?",
+  "When was the last time you experienced feeling lost or alone?",
+  "In what area of your life is God inviting you into deeper sacrifice and selflessness?",
+  "What is one attribute you see in someone in this group that you admire?",
+  "What is one habit you want to break and one you want to build this year?",
+  "In what area of your life do you feel most un-free?",
+  "Do you feel peaceful right now? Why or why not?",
+  "What are 1-2 areas of your life where you feel the largest gap between who you are and who Jesus is inviting you to become?",
+  "What are you currently avoiding in your life — a person, a decision, a problem — and why?",
+  "What attributes emerge when you feel most comfortable and like yourself?",
+  "What is a challenge you are currently facing that requires God’s help?",
+  "What word best describes how you want people to experience you?",
+  "What truth about God are you having a hard time believing right now?",
+  "What are a few attributes you had as a child that are still true of you today or that you have lost?",
+  "What assumptions do people sometimes make about you that are not true?",
+  "What is a word, phrase, or metaphor from Scripture that is guiding you through this season of your life?",
+  "What is one way you feel the need to grow that goes against the grain of your personality?",
+  "If you could relive one childhood memory, what would it be?",
+  "Have you ever been through a season of life that felt like 'the wilderness'? If so, what did you learn?",
+  "How is fear most showing up in your life right now?",
+  "In what stage or time of your life did you feel most alive, and why?",
+  "What was an impactful event in your life that formed who you are today?",
+  "What aspects of following Jesus feel most natural and unnatural to you?",
+  "If you knew you were living your last day, what would you lower in importance that you currently hold as important?"
+];
+
+// --------------- STATE ---------------
+let recentStart = [];
+let recentDeep = [];
+let totalShown = 0;
+
+const elQuestion = document.getElementById('question');
+const elCounter = document.getElementById('counter');
+
+function pick(list, recent) {
+  const pool = list.filter(q => !recent.includes(q));
+  const chosen = pool.length ? pool[Math.floor(Math.random()*pool.length)] : list[Math.floor(Math.random()*list.length)];
+  const updatedRecent = [chosen, ...recent.filter(q => q !== chosen)].slice(0,10);
+  return { chosen, updatedRecent };
+}
+
+function showQuestion(which) {
+  let result;
+  if (which === 'start') {
+    result = pick(START_SMALL, recentStart);
+    recentStart = result.updatedRecent;
+  } else {
+    result = pick(GO_DEEPER, recentDeep);
+    recentDeep = result.updatedRecent;
+  }
+  totalShown += 1;
+  elQuestion.textContent = result.chosen;
+  elCounter.textContent = `Shown: ${totalShown} • Avoiding last 10 repeats (${which === 'start' ? recentStart.length : recentDeep.length} tracked)`;
+}
+
+document.getElementById('btnStart').addEventListener('click', () => showQuestion('start'));
+document.getElementById('btnDeep').addEventListener('click', () => showQuestion('deep'));
+document.getElementById('reset').addEventListener('click', (e) => {
+  e.preventDefault();
+  recentStart = [];
+  recentDeep = [];
+  totalShown = 0;
+  elQuestion.textContent = "";
+  elCounter.textContent = "Ready";
+});
+</script>
+</body>
+</html>
